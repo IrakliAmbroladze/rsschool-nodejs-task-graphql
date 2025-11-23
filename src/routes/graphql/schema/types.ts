@@ -9,6 +9,7 @@ import {
   GraphQLEnumType,
 } from 'graphql';
 import { UUIDType } from '../types/uuid.js';
+import type { GraphQLContext } from './context.js';
 
 export const MemberTypeIdEnum = new GraphQLEnumType({
   name: 'MemberTypeId',
@@ -44,7 +45,7 @@ export const ProfileType: GraphQLObjectType = new GraphQLObjectType({
     yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
     memberType: {
       type: new GraphQLNonNull(MemberTypeType),
-      resolve: async (parent, _args, context) => {
+      resolve: async (parent: any, _args, context: GraphQLContext) => {
         return context.memberTypeLoader.load(parent.memberTypeId);
       },
     },
@@ -59,25 +60,25 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
     balance: { type: new GraphQLNonNull(GraphQLFloat) },
     profile: {
       type: ProfileType,
-      resolve: async (parent, _args, context) => {
+      resolve: async (parent: any, _args, context: GraphQLContext) => {
         return context.profileLoader.load(parent.id);
       },
     },
     posts: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(PostType))),
-      resolve: async (parent, _args, context) => {
+      resolve: async (parent: any, _args, context: GraphQLContext) => {
         return context.postsLoader.load(parent.id);
       },
     },
     userSubscribedTo: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
-      resolve: async (parent, _args, context) => {
+      resolve: async (parent: any, _args, context: GraphQLContext) => {
         return context.userSubscribedToLoader.load(parent.id);
       },
     },
     subscribedToUser: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
-      resolve: async (parent, _args, context) => {
+      resolve: async (parent: any, _args, context: GraphQLContext) => {
         return context.subscribedToUserLoader.load(parent.id);
       },
     },

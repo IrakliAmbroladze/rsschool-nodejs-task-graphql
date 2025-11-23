@@ -7,13 +7,14 @@ import {
   MemberTypeType,
   MemberTypeIdEnum,
 } from './types.js';
+import type { GraphQLContext } from './context.js';
 
 export const RootQueryType = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
     memberTypes: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MemberTypeType))),
-      resolve: async (_parent, _args, context) => {
+      resolve: async (_parent, _args, context: GraphQLContext) => {
         return context.prisma.memberType.findMany();
       },
     },
@@ -22,7 +23,7 @@ export const RootQueryType = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(MemberTypeIdEnum) },
       },
-      resolve: async (_parent, args, context) => {
+      resolve: async (_parent, args: { id: string }, context: GraphQLContext) => {
         return context.prisma.memberType.findUnique({
           where: { id: args.id },
         });
@@ -30,7 +31,7 @@ export const RootQueryType = new GraphQLObjectType({
     },
     users: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
-      resolve: async (_parent, _args, context, info) => {
+      resolve: async (_parent, _args, context: GraphQLContext, info) => {
         let needsUserSubscribedTo = false;
         let needsSubscribedToUser = false;
 
@@ -61,7 +62,7 @@ export const RootQueryType = new GraphQLObjectType({
           checkSelections(info.fieldNodes[0].selectionSet.selections);
         }
 
-        const includeObj: any = {};
+        const includeObj: Record<string, boolean> = {};
         if (needsUserSubscribedTo || needsSubscribedToUser) {
           if (needsUserSubscribedTo) {
             includeObj.userSubscribedTo = true;
@@ -75,7 +76,7 @@ export const RootQueryType = new GraphQLObjectType({
           include: Object.keys(includeObj).length > 0 ? includeObj : undefined,
         });
 
-        users.forEach((user) => {
+        users.forEach((user: any) => {
           context.userLoader.prime(user.id, user);
         });
 
@@ -87,13 +88,13 @@ export const RootQueryType = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(UUIDType) },
       },
-      resolve: async (_parent, args, context) => {
+      resolve: async (_parent, args: { id: string }, context: GraphQLContext) => {
         return context.userLoader.load(args.id);
       },
     },
     posts: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(PostType))),
-      resolve: async (_parent, _args, context) => {
+      resolve: async (_parent, _args, context: GraphQLContext) => {
         return context.prisma.post.findMany();
       },
     },
@@ -102,7 +103,7 @@ export const RootQueryType = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(UUIDType) },
       },
-      resolve: async (_parent, args, context) => {
+      resolve: async (_parent, args: { id: string }, context: GraphQLContext) => {
         return context.prisma.post.findUnique({
           where: { id: args.id },
         });
@@ -110,7 +111,7 @@ export const RootQueryType = new GraphQLObjectType({
     },
     profiles: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ProfileType))),
-      resolve: async (_parent, _args, context) => {
+      resolve: async (_parent, _args, context: GraphQLContext) => {
         return context.prisma.profile.findMany();
       },
     },
@@ -119,7 +120,7 @@ export const RootQueryType = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(UUIDType) },
       },
-      resolve: async (_parent, args, context) => {
+      resolve: async (_parent, args: { id: string }, context: GraphQLContext) => {
         return context.prisma.profile.findUnique({
           where: { id: args.id },
         });
